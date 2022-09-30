@@ -21,6 +21,7 @@
 #include "dma2d.h"
 #include "i2c.h"
 #include "ltdc.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -28,6 +29,10 @@
 /* USER CODE BEGIN Includes */
 #include "GT911.h"
 #include "lcd_drv.h"
+#include "lvgl.h"
+#include "lv_port_disp.h"
+#include "lv_port_indev.h"
+#include "lv_demos.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,6 +64,26 @@ static void MPU_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void lv_100ask_demo_course_2_1_1(void)
+{
+
+    lv_obj_t *btn = lv_btn_create(lv_scr_act());
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
+	lv_obj_set_size(btn, 300, 120);
+ 
+    lv_obj_t *label;
+    label = lv_label_create(btn);
+    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+    lv_label_set_text(label, "HELLO LVGL");
+ 
+    static lv_style_t style_btn;
+    lv_style_init(&style_btn);
+    lv_style_set_radius(&style_btn, 10);
+    lv_style_set_border_color(&style_btn, lv_color_white());
+    lv_style_set_border_opa(&style_btn, LV_OPA_30);
+    lv_obj_add_style(btn, &style_btn, LV_STATE_DEFAULT);
+
+}
 
 /* USER CODE END 0 */
 
@@ -97,6 +122,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   MX_DMA2D_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   
   GT911_Set_Addr();
@@ -105,15 +131,26 @@ int main(void)
   Software_Reset(0);
   GT911_INT_IT_SET();
   
+  lv_init();
+  lv_port_disp_init();
+  lv_port_indev_init();
+  
+//  lv_100ask_demo_course_2_1_1();
+//  lv_demo_benchmark();
+//  lv_demo_music();
+  lv_demo_widgets();
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  HAL_TIM_Base_Start_IT(&htim3);
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  lv_task_handler();
   }
   /* USER CODE END 3 */
 }
@@ -181,6 +218,12 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	UNUSED(htim);
+	lv_tick_inc(1);
+}
 
 /* USER CODE END 4 */
 

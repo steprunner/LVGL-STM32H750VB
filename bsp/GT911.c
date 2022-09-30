@@ -187,14 +187,9 @@ void Software_Reset(uint8_t gt_SR_type)
 	}
 }
 
-void GT911_SCAN(void)
+void GT911_SCAN(coord_pos* pos)
 {
 	uint16_t x,y;
-	/*手动延迟避免多次进入触摸*/
-//	static uint8_t _timer=0;
-//	_timer++;
-//	if(_timer<10) return;
-//	_timer=0;
 	/*读取触摸数据*/
 	uint8_t _temp;	//中间变量
 	GT911_ReadReg(GT_GSTID_REG, &_temp, 1);
@@ -211,27 +206,20 @@ void GT911_SCAN(void)
 		UserTouch.Touch_XY[i].Y_Point  = _temp;
 		GT911_ReadReg((GT_TPD_Sta + i*8 + Y_H), &_temp, 1);	//读出触摸y坐标的高8位
 		UserTouch.Touch_XY[i].Y_Point |= (_temp<<8);
-		
-		GT911_ReadReg((GT_TPD_Sta + i*8 + S_L), &_temp, 1);	//读出触摸大小数据的低8位
-		UserTouch.Touch_XY[i].S_Point  = _temp;
-		GT911_ReadReg((GT_TPD_Sta + i*8 + S_H), &_temp, 1);	//读出触摸大小数据的高8位
-		UserTouch.Touch_XY[i].S_Point |= (_temp<<8);
-//		printf("%d,%d,%d\n",UserTouch.Touch_XY[i].X_Point,UserTouch.Touch_XY[i].Y_Point,UserTouch.Touch_XY[i].S_Point);
 		x=UserTouch.Touch_XY[i].X_Point;
 		y=272-UserTouch.Touch_XY[i].Y_Point;
-		FillRect(x,y,4,4,  0xFFFF);
+		pos->x=x;
+		pos->y=y;
 	}
-
 	_temp=0;
 	GT911_WriteReg(GT_GSTID_REG, &_temp, 1);	//清除数据标志位
+
 }
 
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void GT911_SINGLE_SCAN(coord_pos* pos)
 {
-	UNUSED(GPIO_Pin);
-	GT911_SCAN();
-	
+
 }
 
 
