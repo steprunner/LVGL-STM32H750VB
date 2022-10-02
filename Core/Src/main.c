@@ -69,7 +69,7 @@ void lv_100ask_demo_course_2_1_1(void)
 
     lv_obj_t *btn = lv_btn_create(lv_scr_act());
     lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
-	lv_obj_set_size(btn, 300, 120);
+	lv_obj_set_size(btn, 120, 47);
  
     lv_obj_t *label;
     label = lv_label_create(btn);
@@ -83,6 +83,18 @@ void lv_100ask_demo_course_2_1_1(void)
     lv_style_set_border_opa(&style_btn, LV_OPA_30);
     lv_obj_add_style(btn, &style_btn, LV_STATE_DEFAULT);
 
+}
+static void User_Init(void)
+{
+	GT911_Set_Addr();
+	Software_Reset(1);
+	HAL_Delay(100);
+	Software_Reset(0);
+	GT911_INT_IT_SET();
+
+	lv_init();
+	lv_port_disp_init();
+	lv_port_indev_init();
 }
 
 /* USER CODE END 0 */
@@ -124,16 +136,8 @@ int main(void)
   MX_DMA2D_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  
-  GT911_Set_Addr();
-  Software_Reset(1);
-  HAL_Delay(100);
-  Software_Reset(0);
-  GT911_INT_IT_SET();
-  
-  lv_init();
-  lv_port_disp_init();
-  lv_port_indev_init();
+  User_Init();
+
   
 //  lv_100ask_demo_course_2_1_1();
 //  lv_demo_benchmark();
