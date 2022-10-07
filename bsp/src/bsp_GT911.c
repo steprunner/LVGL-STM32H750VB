@@ -1,20 +1,26 @@
-#include "GT911.h"
-#include "i2c.h"
-#include "usart.h"
-#include "lcd_drv.h"
+#include "bsp.h"
+
 /*I2C句柄*/
-#define		GT911_I2C		hi2c1
+#define		GT911_I2C		  hi2c1
 #define		GT911_DIV_ID	0XBA	//设备地址 //0X28 //0XBA
 #define 	GT911_DIV_W		(GT911_DIV_ID | 0)	//写地址
 #define 	GT911_DIV_R		(GT911_DIV_ID | 1)	//读地址
 
-#define RST_DOWN()      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_RESET)
-#define RST_UP()        HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_SET)
-#define WAKE_DOWN()     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_RESET)
-#define WAKE_UP()       HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, GPIO_PIN_SET)
-#define INT_DOWN()      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_RESET)
-#define INT_UP()        HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_SET)
-#define INT_Read         HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4)
+/* 引脚定义 */
+#define RST_PIN     GPIO_PIN_2
+#define RST_PORT    GPIOE
+#define WAKE_PIN    GPIO_PIN_3
+#define WAKE_PORT   GPIOE
+#define INT_PIN     GPIO_PIN_4
+#define INT_PORT    GPIOE
+
+#define RST_DOWN()      HAL_GPIO_WritePin(RST_PORT, RST_PIN, GPIO_PIN_RESET)
+#define RST_UP()        HAL_GPIO_WritePin(RST_PORT, RST_PIN, GPIO_PIN_SET)
+#define WAKE_DOWN()     HAL_GPIO_WritePin(WAKE_PORT, WAKE_PIN, GPIO_PIN_RESET)
+#define WAKE_UP()       HAL_GPIO_WritePin(WAKE_PORT, WAKE_PIN, GPIO_PIN_SET)
+#define INT_DOWN()      HAL_GPIO_WritePin(INT_PORT, INT_PIN, GPIO_PIN_RESET)
+#define INT_UP()        HAL_GPIO_WritePin(INT_PORT, INT_PIN, GPIO_PIN_SET)
+#define INT_Read        HAL_GPIO_ReadPin(INT_PORT,INT_PIN)
 
 //GT911 部分寄存器定义 
 #define GT_CTRL_REG 	0X8040   	//GT911控制寄存器
@@ -94,7 +100,7 @@ const uint8_t GT9147_CFG_TBL[]=
 };  
 
 /*修改INT脚为输出*/
-void GT911_INT_OUTP(void)
+static void GT911_INT_OUTP(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	GPIO_InitStruct.Pin = GPIO_PIN_4;
@@ -104,7 +110,7 @@ void GT911_INT_OUTP(void)
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 }
 
-void GT911_INT_INP(void)
+static void GT911_INT_INP(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	GPIO_InitStruct.Pin = GPIO_PIN_4;
@@ -113,7 +119,7 @@ void GT911_INT_INP(void)
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 }
 
-void GT911_INT_IT_SET(void)
+static void GT911_INT_IT_SET(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	GPIO_InitStruct.Pin = GPIO_PIN_4;
@@ -121,11 +127,11 @@ void GT911_INT_IT_SET(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 	HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 }
 
 /*设置GT911 I2C 地址*/
-void GT911_Set_Addr(void)
+static void GT911_Set_Addr(void)
 {
 	GT911_INT_OUTP();//设置INT脚为输出
 	WAKE_UP();
@@ -136,12 +142,12 @@ void GT911_Set_Addr(void)
 	HAL_Delay(10);//延时10ms
 }
 
-void GT911_WriteReg(uint16_t _usRegAddr, uint8_t *_pRegBuf, uint8_t _ucLen)
+static void GT911_WriteReg(uint16_t _usRegAddr, uint8_t *_pRegBuf, uint8_t _ucLen)
 {
 	HAL_I2C_Mem_Write(&GT911_I2C, GT911_DIV_W, _usRegAddr, I2C_MEMADD_SIZE_16BIT, _pRegBuf, _ucLen, 0xff);
 }
 
-void GT911_ReadReg(uint16_t _usRegAddr, uint8_t *_pRegBuf, uint8_t _ucLen)
+static void GT911_ReadReg(uint16_t _usRegAddr, uint8_t *_pRegBuf, uint8_t _ucLen)
 {
 	HAL_I2C_Mem_Read(&GT911_I2C, GT911_DIV_R, _usRegAddr, I2C_MEMADD_SIZE_16BIT, _pRegBuf, _ucLen, 0xff);
 }
@@ -150,7 +156,7 @@ void GT911_ReadReg(uint16_t _usRegAddr, uint8_t *_pRegBuf, uint8_t _ucLen)
 	配置gt911，发送gt911配置参数
 	参数1：mode（0,参数不保存到flash1,参数保存到flash）
 */
-void GT911_Send_Config(uint8_t mode)
+static void GT911_Send_Config(uint8_t mode)
 {
 	uint8_t buf[2];
 	buf[0] = 0;
@@ -171,7 +177,7 @@ void GT911_Send_Config(uint8_t mode)
 	功能：软件复位gt911
 	参数1：gt_SR_type（为1时开始软件复位,为0时结束软件复位）
 */
-void Software_Reset(uint8_t gt_SR_type)
+static void Software_Reset(uint8_t gt_SR_type)
 {
 	uint8_t _temp=0;	//中间变量
 	
@@ -187,6 +193,19 @@ void Software_Reset(uint8_t gt_SR_type)
 	}
 }
 
+
+/* 外部函数 */
+
+/* gt911初始化 */
+void bsp_GT911_init(void)
+{
+	GT911_Set_Addr();
+	Software_Reset(1);
+	HAL_Delay(100);
+	Software_Reset(0);
+	GT911_INT_IT_SET();
+}
+/* GT911扫描函数 */
 void GT911_SCAN(coord_pos* pos)
 {
 	uint16_t x,y;
@@ -213,14 +232,8 @@ void GT911_SCAN(coord_pos* pos)
 	}
 	_temp=0;
 	GT911_WriteReg(GT_GSTID_REG, &_temp, 1);	//清除数据标志位
-
 }
 
-
-void GT911_SINGLE_SCAN(coord_pos* pos)
-{
-
-}
 
 
 

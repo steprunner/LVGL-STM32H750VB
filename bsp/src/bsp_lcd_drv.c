@@ -1,10 +1,10 @@
-#include "lcd_drv.h"
+#include "bsp_lcd_drv.h"
 #include "ltdc.h"
 #include "dma2d.h"
 
 extern uint16_t LTDC_BUFF[];
 
-static inline void DMA2D_Fill( void * pDst, uint32_t width, uint32_t height, uint32_t lineOff, uint32_t pixelFormat,  uint32_t color) 
+static inline void DMA2D_Fill(void * pDst, uint32_t width, uint32_t height, uint32_t lineOff, uint32_t pixelFormat,  uint32_t color) 
 {
 	/* DMA2D配置 */  
 	DMA2D->CR      = 0x00030000UL;                                  // 配置为寄存器到储存器模式
@@ -19,12 +19,12 @@ static inline void DMA2D_Fill( void * pDst, uint32_t width, uint32_t height, uin
 
 	/* 等待DMA2D传输完成 */
 	while (DMA2D->CR & DMA2D_CR_START);
-}
 
+}
 
 void FillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color)
 {
-    void* pDist = &(LTDC_BUFF[y*480+x]);
-    DMA2D_Fill(pDist, w, h, 480 - w, LTDC_PIXEL_FORMAT_RGB565, color);
+	void* pDist = &( LTDC_BUFF[ y*480+x ] );
+	DMA2D_Fill(pDist, w, h, 480 - w, LTDC_PIXEL_FORMAT_RGB565, color);
 }
 

@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "lv_port_indev.h": "c",
+    "app_test.h": "c"
+  }
+}

@@ -27,12 +27,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "GT911.h"
-#include "lcd_drv.h"
-#include "lvgl.h"
-#include "lv_port_disp.h"
-#include "lv_port_indev.h"
-#include "lv_demos.h"
+
+#include "bsp.h"//板级支持包
+#include "app.h"//lvgl头文件包含在内
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,38 +62,6 @@ static void MPU_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void lv_100ask_demo_course_2_1_1(void)
-{
-
-    lv_obj_t *btn = lv_btn_create(lv_scr_act());
-    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
-	lv_obj_set_size(btn, 120, 47);
- 
-    lv_obj_t *label;
-    label = lv_label_create(btn);
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-    lv_label_set_text(label, "HELLO LVGL");
- 
-    static lv_style_t style_btn;
-    lv_style_init(&style_btn);
-    lv_style_set_radius(&style_btn, 10);
-    lv_style_set_border_color(&style_btn, lv_color_white());
-    lv_style_set_border_opa(&style_btn, LV_OPA_30);
-    lv_obj_add_style(btn, &style_btn, LV_STATE_DEFAULT);
-
-}
-static void User_Init(void)
-{
-	GT911_Set_Addr();
-	Software_Reset(1);
-	HAL_Delay(100);
-	Software_Reset(0);
-	GT911_INT_IT_SET();
-
-	lv_init();
-	lv_port_disp_init();
-	lv_port_indev_init();
-}
 
 /* USER CODE END 0 */
 
@@ -136,14 +102,13 @@ int main(void)
   MX_DMA2D_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  User_Init();
+  app_lvgl_init();
+  app_lvgl_disp();
 
-  
-//  lv_100ask_demo_course_2_1_1();
-//  lv_demo_benchmark();
-//  lv_demo_music();
-  lv_demo_widgets();
-  
+  // lv_demo_benchmark();
+  // lv_demo_music();
+  // lv_demo_widgets();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

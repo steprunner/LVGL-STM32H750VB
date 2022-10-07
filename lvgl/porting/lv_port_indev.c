@@ -11,8 +11,7 @@
  *********************/
 #include "lv_port_indev.h"
 #include "lvgl.h"
-#include "GT911.h"
-#include "usart.h"
+#include "bsp.h"
 
 /*********************
  *      DEFINES

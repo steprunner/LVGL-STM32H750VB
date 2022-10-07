@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H750xx,LV_CONF_INCLUDE_SIMPLE,NDEBUG</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../bsp;../lvgl;../lvgl/src;../lvgl/porting;../lvgl/demos</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../bsp;../lvgl;../lvgl/src;../lvgl/porting;../lvgl/demos;..\app;..\app\inc;..\bsp\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -932,14 +932,19 @@
           <GroupName>bsp</GroupName>
           <Files>
             <File>
-              <FileName>GT911.c</FileName>
+              <FileName>bsp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\bsp\GT911.c</FilePath>
+              <FilePath>..\bsp\bsp.c</FilePath>
             </File>
             <File>
-              <FileName>lcd_drv.c</FileName>
+              <FileName>bsp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\bsp\bsp.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_GT911.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\bsp\lcd_drv.c</FilePath>
+              <FilePath>..\bsp\src\bsp_GT911.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2050,6 +2055,31 @@
               <FileName>lv_port_disp.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\lvgl\porting\lv_port_disp.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>app/config</GroupName>
+          <Files>
+            <File>
+              <FileName>app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\app.c</FilePath>
+            </File>
+            <File>
+              <FileName>app.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app\app.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>app/src</GroupName>
+          <Files>
+            <File>
+              <FileName>app_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\src\app_test.c</FilePath>
             </File>
           </Files>
         </Group>
